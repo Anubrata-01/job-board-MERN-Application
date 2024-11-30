@@ -49,7 +49,7 @@ const Profile = () => {
 
   return (
     <div className="p-6 bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500 text-white rounded-lg shadow-lg">
-      {/* User Details Section */}
+      
       <div className="mb-6">
         <h2 className="text-4xl font-extrabold mb-4">Profile Details</h2>
         <div className="text-lg">
