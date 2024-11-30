@@ -8,6 +8,8 @@ import Recruiter from "./Components/Recruiter";
 import { useAtom } from "jotai";
 import { userDataAtom } from "./store/store";
 import { memo } from "react";
+import JobDetails from "./Components/NavComponents/JobDetails";
+import Profile from "./Components/NavComponents/Profile";
 
 const MemoiezedJobs=memo(Jobs)
 function App() {
@@ -35,6 +37,18 @@ function App() {
           element: <ProtectedRoute isAuth={isAuth}>
             <MemoiezedJobs/>
           </ProtectedRoute>,
+        },
+        {
+          path:"profile",
+          element:<Profile/>
+        },
+        {
+          path: "jobs/:jobId", // Route with jobId as a parameter
+          element: (
+            <ProtectedRoute isAuth={isAuth}>
+              <JobDetails />
+            </ProtectedRoute>
+          ),
         },
       ],
     },

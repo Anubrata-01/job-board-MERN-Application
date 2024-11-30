@@ -116,7 +116,7 @@ export const SignInFunction = async (signInData, SIGNIN_URL, navigate, setUserDa
 };
 
 
-export const getUserInfo = async (INFO_URL, setUserData, navigate) => {
+export const getUserInfo = async (INFO_URL, setUserData) => {
   try {
     const response = await fetch(INFO_URL, {
       method: "GET",
@@ -126,13 +126,6 @@ export const getUserInfo = async (INFO_URL, setUserData, navigate) => {
 
     if (response.ok && data?.user) {
       setUserData(data.user);
-      if(data.user.profileType==="student"){
-        navigate("/home")
-      }
-      else{
-        navigate("/recruiter");
-      }
-      
     } else {
       throw new Error("Network response was not ok");
     }
@@ -140,6 +133,8 @@ export const getUserInfo = async (INFO_URL, setUserData, navigate) => {
     console.error("Error fetching user info:", error.message);
   }
 };
+
+
 
 
 export const logoutFromAccount = async (LOGOUT_URL, setUserData, navigate) => {
@@ -188,5 +183,31 @@ export const postJob = async (JOBPOST_URL, formData,setFormData,initialFormData)
     }
   } catch (err) {
     console.error("Error in posting job:", err);
+  }
+};
+
+export const getAppliedJobs = async (APPLIED_JOBS_URL, userData, setAppliedJobs) => {
+  if (!userData || !userData.email) {
+    console.error("Please provide valid user data with an email.");
+    return;
+  }
+
+  try {
+    const queryParams = new URLSearchParams({ email: userData.email }).toString();
+    const response = await fetch(`${APPLIED_JOBS_URL}?${queryParams}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      setAppliedJobs(data.jobs); // Assuming `data.jobs` contains the applied jobs array.
+    } else {
+      console.error("Failed to fetch applied jobs:", data.message);
+    }
+  } catch (err) {
+    console.error("Error in fetching applied jobs:", err);
   }
 };

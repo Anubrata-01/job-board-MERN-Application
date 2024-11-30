@@ -26,7 +26,7 @@
 // };
 
 import { useAtom } from "jotai";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { userDataAtom } from "../store/store";
 
 export const StudentProtectedRoute = ({ children }) => {
@@ -49,6 +49,15 @@ export const RecruiterProtectedRoute = ({ children }) => {
   return profileType === "recruiter" ? children : <Navigate to="/" />;
 };
 
-export const ProtectedRoute=({isAuth,children})=>{
-    return isAuth?children:<Navigate to="/" />
-}
+// export const ProtectedRoute=({isAuth,children})=>{
+//     return isAuth?children:<Navigate to="/" />
+// }
+export const ProtectedRoute = ({ isAuth, children }) => {
+  const location = useLocation();
+
+  if (!isAuth) {
+    return <Navigate to="/" state={{ from: location }} replace />;
+  }
+
+  return children;
+};

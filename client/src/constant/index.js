@@ -6,4 +6,8 @@ export const INFO_URL=`${AUTH_ROUTES}/userinfo`
 export const LOGOUT_URL=`${AUTH_ROUTES}/logout`
 export const JOBPOST_URL=`${AUTH_ROUTES}/postjob`;
 export const GET_ALL_JOBS=`${AUTH_ROUTES}/getjobs`
+export const GET_JOB_DETAILS=`${AUTH_ROUTES}`
+export const SUBMIT_APPLICATION_URL =`${AUTH_ROUTES}`
+export const APPLIED_JOBS_URL =`${AUTH_ROUTES}/applied-jobs`
+
 

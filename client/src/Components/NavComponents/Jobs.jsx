@@ -2,19 +2,20 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { useNavigate } from "react-router-dom"
 import { GET_ALL_JOBS } from "../../constant";
 
 const fetchJobs = async () => {
   const response = await axios.get(GET_ALL_JOBS, { withCredentials: "include" });
   return response.data.jobs;
 };
-
+ 
 const Job = () => {
   const { data: jobs, isLoading, isError, error } = useQuery({
     queryKey: ["jobs"],
     queryFn: fetchJobs,
   });
-
+ const navigate=useNavigate();
   const [filters, setFilters] = useState({
     area: "",
     salaryRange: "",
@@ -41,6 +42,12 @@ console.log(jobs)
       : true;
     return matchesArea && matchesSalary && matchesExperience && matchesJobType && matchesCompanyName;
   });
+  
+
+  // viewDetails functions
+  const handleViewDetails=(job)=>{
+    navigate(`/home/jobs/${job.jobId}`);
+  }
 
   if (isLoading) return <p className="text-center text-gray-500">Loading...</p>;
   if (isError)
@@ -103,7 +110,7 @@ console.log(jobs)
             >
               <option value="">All</option>
               <option value="Full-Time">Full-Time</option>
-              <option value="Part-time">Part-time</option>
+              <option value="Part-Time">Part-time</option>
               <option value="Contract">Contract</option>
               <option value="Intern">Intern</option>
             </select>
@@ -145,7 +152,7 @@ console.log(jobs)
                   <strong>Salary:</strong> ${job.salary}
                 </p>
                 <button
-                  onClick={() => console.log(`Viewing details for job ID: ${job.jobId}`)}
+                  onClick={()=>handleViewDetails(job)}
                   className="mt-2 inline-block bg-blue-600 text-white font-semibold text-sm px-3 py-1 rounded-md hover:bg-blue-700 transition-colors duration-200"
                 >
                   View Details

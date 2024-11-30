@@ -34,7 +34,6 @@ const JobPost = () => {
     e.preventDefault();
     postJob(JOBPOST_URL,formData,setFormData,initialFormData)
     console.log("Job Posted:", formData);
-    // You can add logic to send this data to the server
   };
 
   return (

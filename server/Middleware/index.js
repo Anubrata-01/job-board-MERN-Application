@@ -1,6 +1,6 @@
 import User from "../models/userSchema.js";
 import jwt from "jsonwebtoken";
-const authenticate = async (req, res, next) => {
+ const authenticate = async (req, res, next) => {
     try {
       const token = req.cookies.jwt_access_token || req.cookies.jwt_refresh_token;
       if (!token) {
@@ -33,4 +33,34 @@ const authenticate = async (req, res, next) => {
     }
   };
   
+ 
   export default authenticate;
+
+//   import multer from "multer";
+// import path from "path";
+
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, "./uploads/resumes"); // Directory to store uploaded resumes
+//   },
+//   filename: (req, file, cb) => {
+//     const uniqueName = `${Date.now()}-${file.originalname}`;
+//     cb(null, uniqueName);
+//   },
+// });
+
+// export const upload = multer({
+//   storage,
+//   limits: { fileSize: 2 * 1024 * 1024 }, // Limit file size to 2MB
+//   fileFilter: (req, file, cb) => {
+//     const fileTypes = /pdf|doc|docx/;
+//     const extName = fileTypes.test(path.extname(file.originalname).toLowerCase());
+//     if (extName) {
+//       return cb(null, true);
+//     } else {
+//       cb(new Error("Only .pdf, .doc, or .docx files are allowed!"));
+//     }
+//   },
+// });
+
+

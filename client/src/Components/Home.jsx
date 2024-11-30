@@ -16,7 +16,6 @@ const Home = () => {
       <div>
         <Outlet/>
       </div>
-      {/* <Hero /> */}
       <Footer/>
     </div>
   )

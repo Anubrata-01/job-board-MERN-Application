@@ -2,7 +2,10 @@ import User from "../models/userSchema.js"
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import JobPost from "../models/jobSchema.js";
-
+import Application from "../models/applicationSchema.js";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 
 // Create access token
 const createAccessToken = (email, userId) => {
@@ -221,10 +224,9 @@ export const logout = async (req, res, next) => {
 
   export const getAllJobs = async (req, res, next) => {
     try {
-      // Fetch all jobs from the database
+    
       const jobs = await JobPost.find();
-  
-      // Check if there are any jobs
+
       if (!jobs || jobs.length === 0) {
         return res.status(404).json({ message: "No job postings found." });
       }
@@ -237,3 +239,128 @@ export const logout = async (req, res, next) => {
     }
   };
   
+
+
+  export const getJobDetails = async (req, res, next) => {
+    const { jobId } = req.params;
+    if (isNaN(jobId)) {
+      return res.status(400).json({ message: "Invalid job ID format. It must be a number." });
+    }
+  
+    try {
+      const job = await JobPost.findOne({ jobId: Number(jobId) });
+  
+      if (!job) {
+        return res.status(404).json({ message: "Job not found." });
+      }
+  
+      res.status(200).json({ message: "Job details retrieved successfully.", job });
+    } catch (err) {
+      console.error("Error retrieving job details:", err);
+      res.status(500).json({ message: "Server error. Please try again later." });
+    }
+  };
+  
+
+  const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      const uploadPath = "./uploads/resumes";
+      if (!fs.existsSync(uploadPath)) {
+        fs.mkdirSync(uploadPath, { recursive: true });
+      }
+  
+      cb(null, uploadPath);
+    },
+    filename: (req, file, cb) => {
+      const uniqueName = `${Date.now()}-${file.originalname}`;
+      cb(null, uniqueName);
+    },
+  });
+  
+  const upload = multer({
+    storage,
+    limits: { fileSize: 2 * 1024 * 1024 }, 
+    fileFilter: (req, file, cb) => {
+      const fileTypes = /pdf|doc|docx/;
+      const extName = fileTypes.test(path.extname(file.originalname).toLowerCase());
+      if (extName) {
+        return cb(null, true);
+      } else {
+        cb(new Error("Only .pdf, .doc, or .docx files are allowed!"));
+      }
+    },
+  }).single("resume"); 
+  
+
+  export const submitApplication = async (req, res) => {
+    upload(req, res, async (err) => {
+      if (err) {
+        console.error("File upload error:", err.message);
+        return res.status(400).json({ message: err.message });
+      }
+  
+      try {
+        const { jobId } = req.params;
+        const { name, email } = req.body;
+  
+        // Validate job existence
+        const job = await JobPost.findOne({ jobId: Number(jobId) });
+        if (!job) {
+          return res.status(404).json({ message: "Job not found." });
+        }
+  
+        // Check if the resume was uploaded
+        const resumePath = req.file?.path;
+        if (!resumePath) {
+          return res.status(400).json({ message: "Resume file is required." });
+        }
+  
+        // Create new application
+        const application = new Application({
+          jobId,
+          name,
+          email,
+          resume: resumePath,
+        });
+  
+        await application.save();
+  
+        res.status(201).json({
+          message: "Application submitted successfully!",
+          application,
+        });
+      } catch (error) {
+        console.error("Error submitting application:", error.message);
+        res.status(500).json({ message: "Failed to submit application." });
+      }
+    });
+  };
+
+
+
+
+  export const appliedJobs = async (req, res) => {
+    const { email } = req.query;
+  
+    if (!email) {
+      return res.status(400).json({ message: "Email is required to fetch applied jobs." });
+    }
+  
+    try {
+      // Fetch applications by the user's email
+      const appliedJobs = await Application.find({ email: String(email) });
+      const jobIds = appliedJobs.map((job) => Number(job.jobId)).filter((id) => !isNaN(id));
+  
+      if (jobIds.length === 0) {
+        return res.status(404).json({ message: "No jobs found for the applied jobs." });
+      }
+      const extractJobs = await JobPost.find({ jobId: { $in: jobIds } });
+  
+      res.status(200).json({ jobs: extractJobs });
+    } catch (err) {
+      console.error("Error fetching applied jobs:", err);
+      res.status(500).json({ message: "Server error while fetching applied jobs." });
+    }
+  };
+  
+  // file upload
