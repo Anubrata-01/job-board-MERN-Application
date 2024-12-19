@@ -186,7 +186,7 @@ export const postJob = async (JOBPOST_URL, formData,setFormData,initialFormData)
   }
 };
 
-export const getAppliedJobs = async (APPLIED_JOBS_URL, userData, setAppliedJobs) => {
+export const getAppliedJobs = async (APPLIED_JOBS_URL, userData) => {
   if (!userData || !userData.email) {
     console.error("Please provide valid user data with an email.");
     return;
@@ -203,11 +203,69 @@ export const getAppliedJobs = async (APPLIED_JOBS_URL, userData, setAppliedJobs)
     const data = await response.json();
 
     if (response.ok) {
-      setAppliedJobs(data.jobs); // Assuming `data.jobs` contains the applied jobs array.
+      return data; // Assuming `data.jobs` contains the applied jobs array.
     } else {
       console.error("Failed to fetch applied jobs:", data.message);
     }
   } catch (err) {
     console.error("Error in fetching applied jobs:", err);
+  }
+};
+
+
+export const getPostedJobsByRecruiter = async (POSTED_JOBS_URL, userData) => {
+  if (!userData || !userData.username) {
+    console.error("Please provide valid user data with a username.");
+    return;
+  }
+
+  try {
+    const queryParams = new URLSearchParams({ username: userData.username }).toString();
+    const response = await fetch(`${POSTED_JOBS_URL}?${queryParams}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+     return data // Assuming `data.jobs` contains the applied jobs array.
+    } else {
+      console.error("Failed to fetch applied jobs:", data.message);
+    }
+  } catch (err) {
+    console.error("Error in fetching applied jobs:", err);
+  }
+};
+
+
+export const updateApplicationStatusClient = async (applicationId, newStatus, API_URL) => {
+  console.log("Sending request to:", API_URL);
+  console.log("Payload:", { applicationId, newStatus });
+
+  try {
+    const response = await fetch(API_URL, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ applicationId, status: newStatus }),
+      credentials: "include",
+
+    });
+
+    console.log("Response status:", response.status);
+
+    if (!response.ok) {
+      throw new Error(`Failed to update status: ${response.statusText}`);
+    }
+
+    const updatedApplication = await response.json();
+    console.log("Updated application:", updatedApplication);
+    return updatedApplication;
+  } catch (error) {
+    console.error("Error updating application status:", error);
+    throw error;
   }
 };

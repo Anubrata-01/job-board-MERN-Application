@@ -5,11 +5,15 @@ import dotenv from "dotenv"
 import router from "./routes/route.js";
 import connectToDB from "./database/db.js";
 import cookieParser from 'cookie-parser';
+import path from "path"
 
 dotenv.config();
 const app=express();
 app.use(express.json());
 app.use(cookieParser());
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+console.log(__dirname)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(cors({
     origin: process.env.NODE_ENV === 'production'
       ? process.env.CORS_ORIGIN

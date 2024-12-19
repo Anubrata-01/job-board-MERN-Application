@@ -9,5 +9,8 @@ export const GET_ALL_JOBS=`${AUTH_ROUTES}/getjobs`
 export const GET_JOB_DETAILS=`${AUTH_ROUTES}`
 export const SUBMIT_APPLICATION_URL =`${AUTH_ROUTES}`
 export const APPLIED_JOBS_URL =`${AUTH_ROUTES}/applied-jobs`
+export const POSTED_JOBS_URL =`${AUTH_ROUTES}/posted-jobs`
+export const UPDATE_STATUS_URL=`${AUTH_ROUTES}/application-status`
+
 
 

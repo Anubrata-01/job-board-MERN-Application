@@ -27,6 +27,7 @@ const applicationSchema = new mongoose.Schema(
       type: String, // Path to the uploaded resume file
       required: true,
     },
+    status: { type: String, default: "Pending" },
     submittedAt: {
       type: Date,
       default: Date.now,

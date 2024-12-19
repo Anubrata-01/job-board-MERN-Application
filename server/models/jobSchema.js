@@ -44,10 +44,14 @@ const jobPostSchema = new mongoose.Schema(
       unique: true,
       required: true,
     },
+    PostedBy:{
+      type:String,
+      required:true
+    }
     
   },
   {
-    timestamps: true, // Adds `createdAt` and `updatedAt` timestamps automatically
+    timestamps: true, 
   }
 );
 

@@ -1,8 +1,12 @@
-import  { useState } from "react";
+import { useState } from "react";
 import { postJob } from "../../utilities";
 import { JOBPOST_URL } from "../../constant";
+import { useAtom } from "jotai";
+import { userDataAtom } from "../../store/store";
 
 const JobPost = () => {
+  const [userData] = useAtom(userDataAtom);
+
   const [formData, setFormData] = useState({
     companyName: "",
     region: "",
@@ -12,9 +16,10 @@ const JobPost = () => {
     jobType: "",
     salary: "",
     jobId: "",
-    
+    PostedBy: userData?.username || ""
   });
-  const initialFormData={
+
+  const initialFormData = {
     companyName: "",
     region: "",
     role: "",
@@ -23,17 +28,17 @@ const JobPost = () => {
     jobType: "",
     salary: "",
     jobId: "",
-    
-  }
+    PostedBy: userData?.username || ""
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
+ console.log(formData)
   const handleSubmit = (e) => {
     e.preventDefault();
-    postJob(JOBPOST_URL,formData,setFormData,initialFormData)
-    console.log("Job Posted:", formData);
+    postJob(JOBPOST_URL, formData, setFormData, initialFormData);
   };
 
   return (
@@ -43,9 +48,8 @@ const JobPost = () => {
           Post a Job Opportunity
         </h1>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Company Name */}
           <div>
-            <label className="block text-gray-700 font-medium mb-1" htmlFor="companyName">
+            <label htmlFor="companyName" className="block text-gray-700 font-medium mb-1">
               Company Name
             </label>
             <input
@@ -59,10 +63,8 @@ const JobPost = () => {
               required
             />
           </div>
-
-          {/* Region */}
           <div>
-            <label className="block text-gray-700 font-medium mb-1" htmlFor="region">
+            <label htmlFor="region" className="block text-gray-700 font-medium mb-1">
               Region
             </label>
             <input
@@ -76,10 +78,8 @@ const JobPost = () => {
               required
             />
           </div>
-
-          {/* Role */}
           <div>
-            <label className="block text-gray-700 font-medium mb-1" htmlFor="role">
+            <label htmlFor="role" className="block text-gray-700 font-medium mb-1">
               Role
             </label>
             <input
@@ -93,10 +93,8 @@ const JobPost = () => {
               required
             />
           </div>
-
-          {/* Description */}
           <div>
-            <label className="block text-gray-700 font-medium mb-1" htmlFor="description">
+            <label htmlFor="description" className="block text-gray-700 font-medium mb-1">
               Job Description
             </label>
             <textarea
@@ -110,10 +108,8 @@ const JobPost = () => {
               required
             ></textarea>
           </div>
-
-          {/* Number of Positions */}
           <div>
-            <label className="block text-gray-700 font-medium mb-1" htmlFor="numberOfPositions">
+            <label htmlFor="numberOfPositions" className="block text-gray-700 font-medium mb-1">
               Number of Positions
             </label>
             <input
@@ -127,10 +123,8 @@ const JobPost = () => {
               required
             />
           </div>
-
-          {/* Job Type */}
           <div>
-            <label className="block text-gray-700 font-medium mb-1" htmlFor="jobType">
+            <label htmlFor="jobType" className="block text-gray-700 font-medium mb-1">
               Job Type
             </label>
             <input
@@ -144,10 +138,8 @@ const JobPost = () => {
               required
             />
           </div>
-
-          {/* Salary */}
           <div>
-            <label className="block text-gray-700 font-medium mb-1" htmlFor="salary">
+            <label htmlFor="salary" className="block text-gray-700 font-medium mb-1">
               Salary
             </label>
             <input
@@ -161,10 +153,8 @@ const JobPost = () => {
               required
             />
           </div>
-
-          {/* Job ID */}
           <div>
-            <label className="block text-gray-700 font-medium mb-1" htmlFor="jobId">
+            <label htmlFor="jobId" className="block text-gray-700 font-medium mb-1">
               Job ID
             </label>
             <input
@@ -178,8 +168,6 @@ const JobPost = () => {
               required
             />
           </div>
-
-          {/* Submit Button */}
           <div className="text-center">
             <button
               type="submit"

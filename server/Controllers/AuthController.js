@@ -185,9 +185,9 @@ export const logout = async (req, res, next) => {
 
   export const jobPost = async (req, res, next) => {
     try {
-      const { companyName, region, role, description, numberOfPositions, jobType, salary, jobId } = req.body;
+      const { companyName, region, role, description, numberOfPositions, jobType, salary, jobId,PostedBy } = req.body;
   
-      if (!companyName || !region || !role || !description || !numberOfPositions || !jobType || !salary || !jobId) {
+      if (!companyName || !region || !role || !description || !numberOfPositions || !jobType || !salary || !jobId ||!PostedBy) {
         return res.status(400).json({ message: "All fields are required." });
       }
   
@@ -201,7 +201,7 @@ export const logout = async (req, res, next) => {
         jobType,
         salary,
         jobId,
-    
+        PostedBy
       };
   
       console.log("Job Posted:", jobPostData);
@@ -211,7 +211,7 @@ export const logout = async (req, res, next) => {
             message:"job is already Present!"
         })
       }
-      const newJob = await JobPost.create({ companyName,region,role,description,numberOfPositions,jobType,salary,jobId });
+      const newJob = await JobPost.create({ companyName,region,role,description,numberOfPositions,jobType,salary,jobId,PostedBy });
       await newJob.save();
       // Respond with success
       res.status(201).json({ message: "Job posted successfully.", job: newJob });
@@ -311,6 +311,7 @@ export const logout = async (req, res, next) => {
   
         // Check if the resume was uploaded
         const resumePath = req.file?.path;
+        console.log(resumePath)
         if (!resumePath) {
           return res.status(400).json({ message: "Resume file is required." });
         }
@@ -363,4 +364,73 @@ export const logout = async (req, res, next) => {
     }
   };
   
-  // file upload
+
+
+  export const postedJobsByRecruiter = async (req, res) => {
+    const { username } = req.query;
+  
+    if (!username) {
+      return res.status(400).json({ message: "Username is required to fetch posted jobs." });
+    }
+  
+    try {
+      const postedJobs = await JobPost.find({ PostedBy: String(username) });
+
+      const jobsId = postedJobs
+      .map((job) => Number(job?.jobId))
+      .filter((id) => !isNaN(id));
+      if (jobsId.length === 0) {
+        return res.status(404).json({ message: "No jobs found for the applicants." });
+      }
+      const applicantForJobs = await Application.find({ jobId: { $in: jobsId} });
+      // console.log("Extracted Jobs:", applicantForJobs);
+
+    res.status(200).json({ jobs: postedJobs, applications: applicantForJobs });
+    } catch (err) {
+      console.error("Error fetching posted jobs:", err);
+      res.status(500).json({ message: "Server error while fetching posted jobs." });
+    }
+  };
+  
+  
+  export const updateApplicationStatusServer = async (req, res) => {
+    try {
+      const { applicationId, status } = req.body;
+  
+      if (!applicationId || !status) {
+        return res.status(400).json({ message: "Application ID and status are required." });
+      }
+  
+      const application = await Application.findByIdAndUpdate(
+        applicationId,
+        { status },
+        { new: true }
+      );
+  
+      if (!application) {
+        return res.status(404).json({ message: "Application not found." });
+      }
+  
+      const job = await JobPost.findOne({ jobId: application.jobId });
+  
+      if (!job) {
+        return res.status(404).json({ message: "Associated job not found." });
+      }
+  
+      const jobWithStatus = {
+        ...job.toObject(),
+        applicationStatus: application.status,
+      };
+  
+      res.status(200).json({
+        message: "Application status updated successfully.",
+        application,
+        job: jobWithStatus,
+      });
+      
+    } catch (error) {
+      res.status(500).json({ message: "Internal server error." });
+    }
+  };
+  
+  
