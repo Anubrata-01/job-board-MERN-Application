@@ -89,7 +89,7 @@ export const SignUp = async (req, res, next) => {
         });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Failed to sign in." });
+        return res.status(500).json({ message: "Failed to sign up.",error:error });
     }
 };
 
@@ -154,7 +154,7 @@ export const SignIn = async (req, res, next) => {
         });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Failed to sign in." });
+        return res.status(500).json({ message: "Failed to sign in.", error:error});
     }
 };
 
