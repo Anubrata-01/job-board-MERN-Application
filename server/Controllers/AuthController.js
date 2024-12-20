@@ -64,17 +64,20 @@ export const SignUp = async (req, res, next) => {
         const refreshAccessToken = createRefreshAccessToken(newUser.email, newUser._id);
 
         // Set tokens as cookies
-        res.cookie("jwt_access_token", accessToken, {
-            httpOnly: true,
-            secure: true,
-            maxAge: 2*24 * 60* 60 * 1000, // 15 minutes
-            
-        });
-        res.cookie("jwt_refresh_token", refreshAccessToken, {
-            httpOnly: true,
-            secure: true,
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        });
+        res.cookie('jwt_access_token', accessToken, {
+          httpOnly: true, // Important for security
+          secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
+          sameSite: 'Strict', // Recommended for security
+          domain: process.env.NODE_ENV === 'production' ? `.{process.env.CORS_ORIGIN}` : 'localhost', // Crucial for Render
+          maxAge: ACCESS_TOKEN_EXPIRY,
+      });
+      res.cookie('jwt_refresh_token', refreshToken, {
+          httpOnly: true, // Important for security
+          secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
+          sameSite: 'Strict', // Recommended for security
+          domain: process.env.NODE_ENV === 'production' ? `.{process.env.CORS_ORIGIN}` : 'localhost', // Crucial for Render
+          maxAge: REFRESH_TOKEN_EXPIRY,
+      });
 
         return res.status(201).send({
             message: "User created successfully",
@@ -126,16 +129,20 @@ export const SignIn = async (req, res, next) => {
         const refreshAccessToken = createRefreshAccessToken(user.email, user._id);
 
         // Set tokens as cookies
-        res.cookie("jwt_access_token", accessToken, {
-            httpOnly: true,
-            secure: true,
-            maxAge: 2 *24 *60 * 60 * 1000, // 15 minutes
-        });
-        res.cookie("jwt_refresh_token", refreshAccessToken, {
-            httpOnly: true,
-            secure: true,
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-        });
+        res.cookie('jwt_access_token', accessToken, {
+          httpOnly: true, // Important for security
+          secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
+          sameSite: 'Strict', // Recommended for security
+          domain: process.env.NODE_ENV === 'production' ? `.{process.env.CORS_ORIGIN}` : 'localhost', // Crucial for Render
+          maxAge: ACCESS_TOKEN_EXPIRY,
+      });
+      res.cookie('jwt_refresh_token', refreshToken, {
+          httpOnly: true, // Important for security
+          secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
+          sameSite: 'Strict', // Recommended for security
+          domain: process.env.NODE_ENV === 'production' ? `.{process.env.CORS_ORIGIN}` : 'localhost', // Crucial for Render
+          maxAge: REFRESH_TOKEN_EXPIRY,
+      });
 
         return res.status(200).send({
             message: "User signed in successfully",
