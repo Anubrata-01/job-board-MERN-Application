@@ -69,14 +69,14 @@ export const SignUp = async (req, res, next) => {
           secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
           sameSite: 'Strict', // Recommended for security
           domain: process.env.NODE_ENV === 'production' ? `.{process.env.CORS_ORIGIN}` : 'localhost', // Crucial for Render
-          maxAge: ACCESS_TOKEN_EXPIRY,
+          maxAge: 2 * 24 * 60 * 60 * 1000,
       });
       res.cookie('jwt_refresh_token', refreshAccessToken, {
           httpOnly: true, // Important for security
           secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
           sameSite: 'Strict', // Recommended for security
           domain: process.env.NODE_ENV === 'production' ? `.{process.env.CORS_ORIGIN}` : 'localhost', // Crucial for Render
-          maxAge: REFRESH_TOKEN_EXPIRY,
+          maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
         return res.status(201).json({
@@ -134,14 +134,14 @@ export const SignIn = async (req, res, next) => {
           secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
           sameSite: 'Strict', // Recommended for security
           domain: process.env.NODE_ENV === 'production' ? `.{process.env.CORS_ORIGIN}` : 'localhost', // Crucial for Render
-          maxAge: ACCESS_TOKEN_EXPIRY,
+          maxAge: 2 * 24 * 60 * 60 * 1000,
       });
       res.cookie('jwt_refresh_token', refreshAccessToken, {
           httpOnly: true, // Important for security
           secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
           sameSite: 'Strict', // Recommended for security
           domain: process.env.NODE_ENV === 'production' ? `.{process.env.CORS_ORIGIN}` : 'localhost', // Crucial for Render
-          maxAge: REFRESH_TOKEN_EXPIRY,
+          maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
         return res.status(200).json({
