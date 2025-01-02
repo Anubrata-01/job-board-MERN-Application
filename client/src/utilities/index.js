@@ -30,7 +30,7 @@ export const handleSignup = async (
           navigate("/recruiter")
         }
         else if(data?.user?.profileType==="student"){
-          navigate("/home");
+          navigate("/");
         }
         else{
           alert("Please select profileType")
@@ -100,7 +100,7 @@ export const SignInFunction = async (signInData, SIGNIN_URL, navigate, setUserDa
         if (data?.user?.profileType === "recruiter") {
           navigate("/recruiter");
         } else if (data?.user?.profileType === "student") {
-          navigate("/home");
+          navigate("/");
         } else {
           alert("Please select profileType");
         }

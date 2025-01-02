@@ -371,7 +371,26 @@ export const logout = async (req, res, next) => {
     }
   };
   
+  export const applicantsForPerJobs = async (req, res) => {
+    try {
+        const jobs = await JobPost.find();
+        const applications = await Application.find();
 
+        const jobApplicantCounts = jobs.map(job => {
+            const applicants = applications.filter(application => application.jobId === job.jobId);
+            return {
+              job:job,
+              applicantCount: applicants.length,
+              jobTitle: job.title, // Uncomment this line to include job title
+            };
+        });
+
+        res.status(200).json(jobApplicantCounts);
+    } catch (err) {
+        console.error(err); // Use console.error for errors
+        res.status(500).json({ message: "Error fetching applicant counts" }); // Send an error response
+    }
+};
 
   export const postedJobsByRecruiter = async (req, res) => {
     const { username } = req.query;

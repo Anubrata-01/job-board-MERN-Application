@@ -26,7 +26,7 @@ const Auth = () => {
             if (userData.profileType === "recruiter") {
               navigate("/recruiter");
             } else if (userData.profileType === "student") {
-              navigate("/home");
+              navigate("/");
             }
           }
         }, [userData, navigate]);

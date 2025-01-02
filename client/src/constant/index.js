@@ -17,6 +17,7 @@ export const SUBMIT_APPLICATION_URL =`${AUTH_ROUTES}`
 export const APPLIED_JOBS_URL =`${AUTH_ROUTES}/applied-jobs`
 export const POSTED_JOBS_URL =`${AUTH_ROUTES}/posted-jobs`
 export const UPDATE_STATUS_URL=`${AUTH_ROUTES}/application-status`
+export const NUMBER_OF_APPLICANTS=`${AUTH_ROUTES}/numberofapplicantperjobs`
 
 
 
