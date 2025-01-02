@@ -12,7 +12,7 @@ router.get("/jobs/:jobId", getJobDetails);
 router.post("/aply/:jobId",authenticate,submitApplication);
 router.get("/applied-jobs",authenticate,appliedJobs);
 router.get("/posted-jobs",authenticate,postedJobsByRecruiter)
-router.get("/numberofapplicantperjobs",authenticate,applicantsForPerJobs)
+router.get("/numberofapplicantperjobs",applicantsForPerJobs)
 router.put("/application-status", authenticate, updateApplicationStatusServer);
 
 

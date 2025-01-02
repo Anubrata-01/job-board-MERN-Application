@@ -95,69 +95,73 @@ export const SignUp = async (req, res, next) => {
 
 // Signin function
 export const SignIn = async (req, res, next) => {
-    try {
-        const { email, password,profileType } = req.body;
-        if (!email || !password || !profileType) {
-            return res.status(400).send("Email and password, profileType are required!");
-        }
+  try {
+      const { email, password, profileType } = req.body;
 
-        // Check if user exists
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(401).send({
-                message: "Invalid email or password!"
-            });
-        }
+      // Input Validation (Important!)
+      if (!email || !password || !profileType) {
+          return res.status(400).json({ message: "Email, password, and profileType are required!" });
+      }
 
-        // profileType Check
-        if (user.profileType !== profileType) {
-            return res.status(403).send({
-                message: "Profile type mismatch! Please choose the correct profile type."
-            });
-        }
-        
-        // Compare passwords
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-            return res.status(401).send({
-                message: "Invalid email or password!"
-            });
-        }
+      // Check if user exists
+      const user = await User.findOne({ email });
 
-        // Create tokens
-        const accessToken = createAccessToken(user.email, user._id);
-        const refreshAccessToken = createRefreshAccessToken(user.email, user._id);
+      if (!user) {
+          return res.status(401).json({ message: "Invalid email or password!" });
+      }
 
-        // Set tokens as cookies
-        res.cookie('jwt_access_token', accessToken, {
-          httpOnly: true, // Important for security
-          secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
-          sameSite: 'Strict', // Recommended for security
-          domain: process.env.NODE_ENV === 'production' ? `.{process.env.CORS_ORIGIN}` : 'localhost', // Crucial for Render
+      // Profile Type Check
+      if (user.profileType !== profileType) {
+          return res.status(403).json({ message: "Profile type mismatch! Please choose the correct profile type." });
+      }
+
+      // Compare passwords
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+
+      if (!isPasswordValid) {
+          return res.status(401).json({ message: "Invalid email or password!" });
+      }
+
+      // Create tokens (Assuming these functions are defined elsewhere)
+      const accessToken = createAccessToken(user.email, user._id);
+      const refreshAccessToken = createRefreshAccessToken(user.email, user._id);
+
+      // Set tokens as cookies
+      res.cookie('jwt_access_token', accessToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'Strict',
+          domain: process.env.NODE_ENV === 'production' ? `.${process.env.CORS_ORIGIN}` : 'localhost',
           maxAge: 2 * 24 * 60 * 60 * 1000,
       });
+
       res.cookie('jwt_refresh_token', refreshAccessToken, {
-          httpOnly: true, // Important for security
-          secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
-          sameSite: 'Strict', // Recommended for security
-          domain: process.env.NODE_ENV === 'production' ? `.{process.env.CORS_ORIGIN}` : 'localhost', // Crucial for Render
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'Strict',
+          domain: process.env.NODE_ENV === 'production' ? `.${process.env.CORS_ORIGIN}` : 'localhost',
           maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
-        return res.status(200).json({
-            message: "User signed in successfully",
-            user: {
-                username: user.username,
-                email: user.email,
-                profileType:profileType
-            }
-        });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: "Failed to sign in.", error:error});
-    }
+      return res.status(200).json({
+          message: "User signed in successfully",
+          user: {
+              username: user.username,
+              email: user.email,
+              profileType: user.profileType // Use the user's profileType from the database
+          }
+      });
+  } catch (error) {
+      console.error("Sign-in error:", error); // Log the full error object
+      if (error.name === 'ValidationError') { // Example Mongoose validation error
+        return res.status(400).json({ message: "Validation Error", details: error.errors });
+      }
+      if(error.name === 'CastError'){
+        return res.status(400).json({message:"Invalid input"})
+      }
+      return res.status(500).json({ message: "Failed to sign in.", error: error.message }); // Send error message to client
+  }
 };
-
 
 export const getUserInfo = async (req, res) => {
     try {
