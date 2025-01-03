@@ -14,14 +14,31 @@ app.use(cookieParser());
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 console.log(__dirname)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use(cors({
-    origin: process.env.NODE_ENV === 'production'
-      ? process.env.CORS_ORIGIN
-      : process.env.LOCAL_ORIGIN,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
-  }))
+const corsOptions = {
+  origin: (origin, callback) => {
+      const allowedOrigins = process.env.NODE_ENV === 'production'
+          ? [process.env.CORS_ORIGIN]
+          : [process.env.LOCAL_ORIGIN, undefined]; // undefined for same-origin in dev
+
+      if (allowedOrigins.includes(origin)) {
+          callback(null, true);
+      } else {
+          callback(new Error('Not allowed by CORS'));
+      }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  credentials: true,
+};
+// app.use(cors({
+//     origin: process.env.NODE_ENV === 'production'
+//       ? process.env.CORS_ORIGIN
+//       : process.env.LOCAL_ORIGIN,
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//     allowedHeaders: ['Content-Type', 'Authorization'],
+//     credentials: true
+//   }))
+app.use(cors(corsOptions))
 app.use("/api/auth",router)
   console.log(`Running in ${process.env.NODE_ENV} mode`);
   connectToDB()
