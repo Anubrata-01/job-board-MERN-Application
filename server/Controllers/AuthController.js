@@ -62,20 +62,23 @@ export const SignUp = async (req, res, next) => {
         // Create tokens
         const accessToken = createAccessToken(newUser.email, newUser._id);
         const refreshAccessToken = createRefreshAccessToken(newUser.email, newUser._id);
-
+        const domain =
+        process.env.NODE_ENV === 'production'
+          ? new URL(process.env.CORS_ORIGIN).hostname // Extract hostname from URL
+          : 'localhost';
         // Set tokens as cookies
         res.cookie('jwt_access_token', accessToken, {
           httpOnly: true, // Important for security
           secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
           sameSite: 'Strict', // Recommended for security
-          domain: process.env.NODE_ENV === 'production' ? `.${process.env.CORS_ORIGIN}` : 'localhost', // Crucial for Render
+          domain: domain,
           maxAge: 2 * 24 * 60 * 60 * 1000,
       });
       res.cookie('jwt_refresh_token', refreshAccessToken, {
           httpOnly: true, // Important for security
           secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
           sameSite: 'Strict', // Recommended for security
-          domain: process.env.NODE_ENV === 'production' ? `.${process.env.CORS_ORIGIN}` : 'localhost', // Crucial for Render
+          domain: domain,
           maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
@@ -125,13 +128,17 @@ export const SignIn = async (req, res, next) => {
       // Create tokens (Assuming these functions are defined elsewhere)
       const accessToken = createAccessToken(user.email, user._id);
       const refreshAccessToken = createRefreshAccessToken(user.email, user._id);
-
+      
+      const domain =
+      process.env.NODE_ENV === 'production'
+        ? new URL(process.env.CORS_ORIGIN).hostname // Extract hostname from URL
+        : 'localhost';
       // Set tokens as cookies
       res.cookie('jwt_access_token', accessToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
           sameSite: 'Strict',
-          domain: process.env.NODE_ENV === 'production' ? `.${process.env.CORS_ORIGIN}` : 'localhost',
+          domain: domain,
           maxAge: 2 * 24 * 60 * 60 * 1000,
       });
 
@@ -139,7 +146,7 @@ export const SignIn = async (req, res, next) => {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
           sameSite: 'Strict',
-          domain: process.env.NODE_ENV === 'production' ? `.${process.env.CORS_ORIGIN}` : 'localhost',
+          domain: domain,
           maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
