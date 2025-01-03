@@ -133,6 +133,8 @@ export const SignIn = async (req, res, next) => {
       process.env.NODE_ENV === 'production'
         ? new URL(process.env.CORS_ORIGIN).hostname // Extract hostname from URL
         : 'localhost';
+      console.log(domain)
+      console.log(new URL(process.env.CORS_ORIGIN).hostname);
       // Set tokens as cookies
       res.cookie('jwt_access_token', accessToken, {
           httpOnly: true,
@@ -188,16 +190,36 @@ export const getUserInfo = async (req, res) => {
     }
 };
 
+// export const logout = async (req, res, next) => {
+//     try {
+//       res.clearCookie('jwt_access_token', { path: '/', secure: true, sameSite: 'None' });
+//       res.clearCookie('jwt_refresh_token', { path: '/', secure: true, sameSite: 'None' });
+//       return res.status(200).send("Logout successful");
+//     } catch (error) {
+//       console.error({ error });
+//       return res.status(500).send("Internal server error");
+//     }
+//   };
+
 export const logout = async (req, res, next) => {
-    try {
-      res.clearCookie('jwt_access_token', { path: '/', secure: true, sameSite: 'None' });
-      res.clearCookie('jwt_refresh_token', { path: '/', secure: true, sameSite: 'None' });
-      return res.status(200).send("Logout successful");
-    } catch (error) {
-      console.error({ error });
-      return res.status(500).send("Internal server error");
-    }
-  };
+  try {
+      const cookieOptions = {
+          path: '/',
+          secure: process.env.NODE_ENV === 'production', // Secure only in production
+          sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax', // Lax in dev, None in prod
+      };
+
+      // Clear cookies
+      res.clearCookie('jwt_access_token', cookieOptions);
+      res.clearCookie('jwt_refresh_token', cookieOptions);
+
+      return res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+      console.error("Logout error:", error);
+      return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 
 
 
