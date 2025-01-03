@@ -70,14 +70,15 @@ export const SignUp = async (req, res, next) => {
         res.cookie('jwt_access_token', accessToken, {
           httpOnly: true, // Important for security
           secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
-          sameSite: 'Strict', // Recommended for security
+          sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
           domain: domain,
           maxAge: 2 * 24 * 60 * 60 * 1000,
       });
       res.cookie('jwt_refresh_token', refreshAccessToken, {
           httpOnly: true, // Important for security
           secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
-          sameSite: 'Strict', // Recommended for security
+          // sameSite: 'Strict', // Recommended for security
+          sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
           domain: domain,
           maxAge: 7 * 24 * 60 * 60 * 1000,
       });
@@ -139,7 +140,7 @@ export const SignIn = async (req, res, next) => {
       res.cookie('jwt_access_token', accessToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
-          sameSite: 'Strict',
+          sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
           domain: domain,
           maxAge: 2 * 24 * 60 * 60 * 1000,
       });
@@ -147,7 +148,7 @@ export const SignIn = async (req, res, next) => {
       res.cookie('jwt_refresh_token', refreshAccessToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
-          sameSite: 'Strict',
+          sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
           domain: domain,
           maxAge: 7 * 24 * 60 * 60 * 1000,
       });
