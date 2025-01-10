@@ -70,17 +70,20 @@ export const SignUp = async (req, res, next) => {
         res.cookie('jwt_access_token', accessToken, {
           httpOnly: true, // Important for security
           secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
-          // sameSite:  'None' ,
-          // domain: domain,
+          sameSite:  'None' ,
+          domain: `.${domain}`,
           maxAge: 2 * 24 * 60 * 60 * 1000,
+          path:'/'
+
       });
       res.cookie('jwt_refresh_token', refreshAccessToken, {
           httpOnly: true, // Important for security
           secure: process.env.NODE_ENV === 'production', // Only send over HTTPS in production
           // sameSite: 'Strict', // Recommended for security
-          // sameSite:'None',
-          // domain: domain,
+          sameSite:'None',
+          domain: `.${domain}`,
           maxAge: 7 * 24 * 60 * 60 * 1000,
+          path:'/'
       });
 
         return res.status(201).json({
@@ -140,17 +143,21 @@ export const SignIn = async (req, res, next) => {
       res.cookie('jwt_access_token', accessToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
-          // sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
-          // domain: domain,
+          sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+          domain: `.${domain}`,
           maxAge: 2 * 24 * 60 * 60 * 1000,
+          path:'/'
+
       });
 
       res.cookie('jwt_refresh_token', refreshAccessToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
-          // sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
-          // domain: domain,
+          sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+          domain: `.${domain}`,
           maxAge: 7 * 24 * 60 * 60 * 1000,
+          path:'/'
+
       });
 
       return res.status(200).json({
