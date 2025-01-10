@@ -149,6 +149,8 @@ export const logoutFromAccount = async (LOGOUT_URL, setUserData, navigate) => {
       navigate("/"); // Redirect to the home page
     } else {
       console.error(`Logout failed with status: ${response.status}`);
+      const data = await response.json();
+      console.error("Logout error:", data.message);
     }
   } catch (error) {
     console.error("Error during logout:", error);

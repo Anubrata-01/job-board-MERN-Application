@@ -103,83 +103,77 @@ export const SignUp = async (req, res, next) => {
 // Signin function
 export const SignIn = async (req, res, next) => {
   try {
-      const { email, password, profileType } = req.body;
+    const { email, password, profileType } = req.body;
 
-      // Input Validation (Important!)
-      if (!email || !password || !profileType) {
-          return res.status(400).json({ message: "Email, password, and profileType are required!" });
-      }
+    // Input Validation (Important!)
+    if (!email || !password || !profileType) {
+      return res.status(400).json({ message: "Email, password, and profileType are required!" });
+    }
 
-      // Check if user exists
-      const user = await User.findOne({ email });
+    // Check if user exists
+    const user = await User.findOne({ email });
 
-      if (!user) {
-          return res.status(401).json({ message: "Invalid email or password!" });
-      }
+    if (!user) {
+      return res.status(401).json({ message: "Invalid email or password!" });
+    }
 
-      // Profile Type Check
-      if (user.profileType !== profileType) {
-          return res.status(403).json({ message: "Profile type mismatch! Please choose the correct profile type." });
-      }
+    // Profile Type Check
+    if (user.profileType !== profileType) {
+      return res.status(403).json({ message: "Profile type mismatch! Please choose the correct profile type." });
+    }
 
-      // Compare passwords
-      const isPasswordValid = await bcrypt.compare(password, user.password);
+    // Compare passwords
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
-      if (!isPasswordValid) {
-          return res.status(401).json({ message: "Invalid email or password!" });
-      }
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Invalid email or password!" });
+    }
 
-      // Create tokens (Assuming these functions are defined elsewhere)
-      const accessToken = createAccessToken(user.email, user._id);
-      const refreshAccessToken = createRefreshAccessToken(user.email, user._id);
-      
-      const domain =
-      process.env.NODE_ENV === 'production'
-        ? new URL(process.env.CORS_ORIGIN).hostname // Extract hostname from URL
-        : 'localhost';
-      console.log(domain)
-      console.log(new URL(process.env.CORS_ORIGIN).hostname);
-      // Set tokens as cookies
-      res.cookie('jwt_access_token', accessToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
-          domain: `.${domain}`,
-          maxAge: 2 * 24 * 60 * 60 * 1000,
-          path:'/'
+    // Create tokens (Assuming these functions are defined elsewhere)
+    const accessToken = createAccessToken(user.email, user._id);
+    const refreshAccessToken = createRefreshAccessToken(user.email, user._id);
 
-      });
+    // Set the domain for cookies based on environment
+    const domain = process.env.NODE_ENV === 'production' ? process.env.CORS_ORIGIN : 'localhost';
 
-      res.cookie('jwt_refresh_token', refreshAccessToken, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
-          domain: `.${domain}`,
-          maxAge: 7 * 24 * 60 * 60 * 1000,
-          path:'/'
+    // Set tokens as cookies with secure options for production
+    res.cookie('jwt_access_token', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+      domain: `.${new URL(domain).hostname}`, // Extract hostname and prepend dot for subdomains
+      path: '/',
+      maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days
+    });
 
-      });
+    res.cookie('jwt_refresh_token', refreshAccessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+      domain: `.${new URL(domain).hostname}`, // Extract hostname and prepend dot for subdomains
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
 
-      return res.status(200).json({
-          message: "User signed in successfully",
-          user: {
-              username: user.username,
-              email: user.email,
-              profileType: user.profileType // Use the user's profileType from the database
-          }
-      });
+    return res.status(200).json({
+      message: "User signed in successfully",
+      user: {
+        username: user.username,
+        email: user.email,
+        profileType: user.profileType,
+      },
+    });
   } catch (error) {
-      console.error("Sign-in error:", error); // Log the full error object
-      if (error.name === 'ValidationError') { // Example Mongoose validation error
-        return res.status(400).json({ message: "Validation Error", details: error.errors });
-      }
-      if(error.name === 'CastError'){
-        return res.status(400).json({message:"Invalid input"})
-      }
-      return res.status(500).json({ message: "Failed to sign in.", error: error.message }); // Send error message to client
+    console.error("Sign-in error:", error); // Log the full error object
+    if (error.name === 'ValidationError') { // Example Mongoose validation error
+      return res.status(400).json({ message: "Validation Error", details: error.errors });
+    }
+    if(error.name === 'CastError'){
+      return res.status(400).json({message:"Invalid input"})
+    }
+    return res.status(500).json({ message: "Failed to sign in.", error: error.message }); // Send error message to client
   }
 };
-
 export const getUserInfo = async (req, res) => {
     try {
         const user = req.user; 
